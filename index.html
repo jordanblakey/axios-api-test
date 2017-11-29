@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Login Test</title>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootswatch/3.3.7/yeti/bootstrap.min.css">
+  <style>
+    .panel{box-shadow: none;}
+    .form-inline .form-group{display: flex;}
+    .form-inline .form-control{width:100%}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12">
+        <h1>Login Test</h1>
+      </div>
+    </div>
+    <div class="row"><div class="col-md">&nbsp;</div></div>
+    <div class="row">
+      <div class="col-md-6 col-sm-12 panel">
+        <button class="btn btn-secondary" onclick="request('games', '')">Get Games</button>
+        <button class="btn btn-secondary" onclick="request('games', 'calculating-handmade-plastic-hat-loaf')">Get Game</button>
+        <button class="btn btn-secondary" onclick="request('users', '')">Get Users</button>
+        <button class="btn btn-secondary" onclick="request('users', '593a2c245ee35676febbbf9e')">Get User</button>
+      </div>
+      <div class="col-md-6 col-sm-12 panel">
+          <form class="form-inline">
+            <div class="form-group">
+              <input class="form-control" type="text" id="email" value="test@gmail.com">&nbsp;
+              <input class="form-control" type="text" id="password" value="password">
+              <input type="submit" class="btn btn-primary" onclick="processForm(); return false;" value="Log In" />
+            </div>
+          </form>
+        </div>
+    </div>
+    <div class="row">
+      <div class="col-md col-sm-12">
+        <div>
+          <pre id="response" class="">Waiting for an API request...</pre>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // TEMP CODE /////////////////////////////////////////////////////////////////
+    let print = (r) => {
+      return JSON.stringify(r,null,'\t').replace(/\n/g,'<br>').replace(/\t/g,'&nbsp;&nbsp;&nbsp;');
+    }
+
+    let processForm = () => {
+      try {
+        email = document.getElementById('email').value;
+        password = document.getElementById('password').value;
+      } catch (error) {
+        document.getElementById('response').innerHTML = print(error);
+      }
+      login();
+    }
+    // END TEMP CODE /////////////////////////////////////////////////////////////
+
+    // const axios = require('axios');
+
+    let login = () => {
+      axios({
+        method: 'post',
+        url: 'https://overtureapp.com/api/authenticate',
+        data: {
+          email: email, // Use form input w/ validation
+          password: password // Use form input w/ validation
+        },
+        headers: {
+          'content-type': 'application/json'
+        }
+      })
+      .then((response) => {
+        let t = JSON.stringify(response.data.data.token).replace(/(^")|("$)/gi, "");
+        localStorage.setItem('token', t);
+        document.getElementById('response').innerHTML = print(response);
+      })
+      .catch((error) => {
+        return error;
+      });
+    }
+
+    let request = (endpoint, id) => {
+      axios({
+        method: 'get',
+        url: 'https://overtureapp.com/api/' + endpoint + '/' + id, // Get ID from UI
+        headers: {
+          'Authorization': 'Bearer ' + localStorage.getItem('token')
+        }
+      })
+      .then((response) => {
+        document.getElementById('response').innerHTML = print(response);
+        return response.data;
+      })
+      .catch((error) => {
+        return error;
+      });
+    }
+  </script>
+</body>
+</html>

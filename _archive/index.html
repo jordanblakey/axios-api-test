@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+  <!-- Including in an HTML file -->
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+</head>
+<body>
+  <h3 id="status">Not logged in.</h3>
+  <form>
+    Email:<br>
+    <input type="text" id="email" value="test@gmail.com">
+    <br>
+    Password:<br>
+    <input type="text" id="password" value="password">
+    <br>
+  </form>
+    <button onclick="login()">Log In</button>
+  <button onclick="getGames()">Get Games</button>
+  <code id="response"></code>
+<script>
+// const axios = require('axios');
+
+  function print(o) {
+    return JSON.stringify(o,null,'\t').replace(/\n/g,'<br>').replace(/\t/g,'&nbsp;&nbsp;&nbsp;');
+  }
+
+  function login() {
+    console.log(document.getElementById('email').value);
+    console.log(document.getElementById('password').value);
+    try {
+      email = document.getElementById('email').value;
+      password = document.getElementById('password').value;
+    } catch (error) {
+      alert(error);
+    }
+
+    axios({
+      method: 'post',
+      url: 'https://overtureapp.com/api/authenticate',
+      data: {
+        email: email,
+        password: password
+      },
+      headers: {
+        'content-type': 'application/json'
+      }
+    })
+    .then(function(response) {
+      localStorage.setItem('token', JSON.stringify(response.data.data.token).replace(/(^\")|("$)/gi, ""));
+      document.getElementById('status').innerHTML = 'Logged In.';
+      document.getElementById('response').innerHTML = print(response.data);
+    })
+    .catch(function(error){
+      console.log(error);
+      document.getElementById('status').innerHTML = 'Login Error.';
+    });
+  }
+
+  function getGames() {
+    console.log("'Bearer " + localStorage.getItem('token'));
+    axios({
+      method: 'get',
+      url: 'https://overtureapp.com/api/games',
+      headers: {
+        'Authorization': 'Bearer '+localStorage.getItem('token')
+      }
+    })
+    .then(function(response) {
+      console.log(response.data);
+      // console.log(response.status);
+      // console.log(response.statusText);
+      // console.log(response.headers);
+      // console.log(response.config);
+      document.getElementById('response').innerHTML = print(response.data);
+    })
+    .catch(function(error){
+      console.log(error);
+    });
+  }
+
+</script>
+</body>
+</html>
