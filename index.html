@@ -78,7 +78,7 @@
       .then((response) => {
         let t = JSON.stringify(response.data.data.token).replace(/(^")|("$)/gi, "");
         localStorage.setItem('token', t);
-        document.getElementById('response').innerHTML = print(response);
+        document.getElementById('response').innerHTML = print(response); // TEMP CODE
       })
       .catch((error) => {
         return error;
@@ -94,7 +94,7 @@
         }
       })
       .then((response) => {
-        document.getElementById('response').innerHTML = print(response);
+        document.getElementById('response').innerHTML = print(response); // TEMP CODE
         return response.data;
       })
       .catch((error) => {
